@@ -8,9 +8,9 @@ export async function createUserHandler(
   try {
     const { email } = request.body as { email: string };
 
-    const user = await createUser({ email });
+    //const user = await createUser({ email: "asd" });
 
-    reply.status(201).send(user);
+    reply.status(201).send("user");
   } catch (error) {
     reply.status(500).send({ message: "Something went wrong" });
   }
