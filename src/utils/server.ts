@@ -1,3 +1,4 @@
+import { rentalSchemas } from "@/modules/rental/rental.schema";
 import { userSchemas } from "@/modules/user/user.schema";
 import { Role } from "@/types";
 import { buildDatabase } from "@/utils/db";
@@ -40,7 +41,7 @@ export async function buildServer() {
     }
   );
 
-  for (const schema of [...userSchemas]) {
+  for (const schema of [...userSchemas, ...rentalSchemas]) {
     server.addSchema(schema);
   }
 

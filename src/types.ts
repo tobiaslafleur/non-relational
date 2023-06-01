@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 export type User = {
-  _id: ObjectId;
+  _id?: ObjectId;
   email: string;
   firstname: string;
   lastname: string;
@@ -9,19 +9,19 @@ export type User = {
     enrolled: boolean;
     points: number;
   };
-  rentals: string[];
+  rentals: ObjectId[];
   role: Role;
   employeeInformation?: {
-    position: string;
-    location: string;
+    position?: string;
+    location?: ObjectId;
   };
   comments?: string[];
 };
 
 export type Rental = {
-  _id: ObjectId;
-  user: string;
-  vehicle: string;
+  _id?: ObjectId;
+  user: ObjectId;
+  vehicle: ObjectId;
   condition?: {
     before: string;
     after: string;
@@ -36,8 +36,8 @@ export type Rental = {
     pointsGenerated: number;
   };
   location: {
-    pickup: Location;
-    dropoff: Location;
+    pickup: ObjectId;
+    dropoff: ObjectId;
   };
   date: {
     pickup: Date;
@@ -46,12 +46,12 @@ export type Rental = {
 };
 
 export type Location = {
-  _id: ObjectId;
+  _id?: ObjectId;
   name: string;
 };
 
 export type Vehicle = {
-  _id: ObjectId;
+  _id?: ObjectId;
   name: string;
   type: VehicleType;
   rentals: string[];
@@ -60,7 +60,7 @@ export type Vehicle = {
 };
 
 export type Comments = {
-  _id: ObjectId;
+  _id?: ObjectId;
   user: string;
   comments: string[];
 };

@@ -3,9 +3,19 @@ import { userCollection } from "@/utils/db";
 import { ObjectId } from "mongodb";
 
 export async function createUser(input: CreateUserInput) {
-  const res = await userCollection.insertOne(input);
+  const { rentals, employeeInformation, ...rest } = input;
 
-  console.log(res);
+  const rentalsAsObjectId = rentals.map(function (rental) {
+    return new ObjectId(rental);
+  });
+
+  const res = await userCollection.insertOne({
+    rentals: rentalsAsObjectId,
+    employeeInformation: {
+      location: new ObjectId(employeeInformation?.location),
+    },
+    ...rest,
+  });
 
   const user = await userCollection.findOne({ _id: res.insertedId });
 
@@ -21,10 +31,8 @@ export async function getAllUsers() {
 }
 
 export async function updateUserById(input: UpdateUserInput, id: string) {
-  const _id = new ObjectId(id);
-
   const { value: user } = await userCollection.findOneAndUpdate(
-    { _id },
+    { _id: new ObjectId(id) },
     {
       $set: {
         ...(input as any),

@@ -1,4 +1,4 @@
-import { User } from "@/types";
+import { Rental, User } from "@/types";
 import * as dotenv from "dotenv";
 dotenv.config();
 import { MongoClient } from "mongodb";
@@ -6,7 +6,10 @@ import { MongoClient } from "mongodb";
 export const mongoClient = new MongoClient(process.env.MONGO_URI as string);
 export const db = mongoClient.db("car-rental");
 
-export const userCollection = db.collection<Omit<User, "_id">>("user", {
+export const userCollection = db.collection<User>("user", {
+  ignoreUndefined: true,
+});
+export const rentalCollection = db.collection<Rental>("rental", {
   ignoreUndefined: true,
 });
 
