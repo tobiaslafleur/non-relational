@@ -22,11 +22,36 @@ const createUserInputSchema = z.object({
   comments: z.array(z.string()).optional(),
 });
 
+const updateUserInputSchema = z.object({
+  email: z.string().optional(),
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+  loyaltyProgram: z
+    .object({
+      enrolled: z.boolean().optional(),
+      points: z.number().optional(),
+    })
+    .optional(),
+  rentals: z.array(z.string()).optional(),
+  role: z
+    .union([z.literal("CUSTOMER"), z.literal("EMPLOYEE"), z.literal("MANAGER")])
+    .optional(),
+  employeeInformation: z
+    .object({
+      position: z.string().optional(),
+      location: z.string().optional(),
+    })
+    .optional(),
+  comments: z.array(z.string()).optional(),
+});
+
 export type CreateUserInput = z.infer<typeof createUserInputSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserInputSchema>;
 
 export const { schemas: userSchemas, $ref: userRef } = buildJsonSchemas(
   {
     createUserInputSchema,
+    updateUserInputSchema,
   },
   {
     $id: "UserSchema",
