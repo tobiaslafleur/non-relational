@@ -1,12 +1,12 @@
 import { User } from "@/types";
 import { userCollection } from "@/utils/db";
 
-export async function createUser(input: User) {
-  const { email } = input;
+export async function createUser(input: Omit<User, "_id">) {
+  const res = await userCollection.insertOne(input);
 
-  const { insertedId } = await userCollection.insertOne(input);
+  console.log(res);
 
-  const user = await userCollection.findOne({ _id: insertedId });
+  const user = await userCollection.findOne({ _id: res.insertedId });
 
   if (!user) throw new Error("Could not find user");
 

@@ -6,7 +6,7 @@ import { MongoClient } from "mongodb";
 export const mongoClient = new MongoClient(process.env.MONGO_URI as string);
 export const db = mongoClient.db("car-rental");
 
-export const userCollection = db.collection<User>("user");
+export const userCollection = db.collection<Omit<User, "_id">>("user");
 
 export async function buildDatabase() {
   try {
