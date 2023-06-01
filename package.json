@@ -1,0 +1,20 @@
+{
+  "name": "non-relational",
+  "version": "1.0.0",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "tsx watch src/main.ts"
+  },
+  "keywords": [],
+  "author": "Tobias la Fleur",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.1.3",
+    "fastify": "^4.17.0",
+    "mongodb": "^5.5.0"
+  },
+  "devDependencies": {
+    "tsx": "^3.12.7",
+    "typescript": "^5.0.4"
+  }
+}
