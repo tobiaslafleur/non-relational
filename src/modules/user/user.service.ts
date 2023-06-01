@@ -12,3 +12,9 @@ export async function createUser(input: Omit<User, "_id">) {
 
   return user;
 }
+
+export async function getAllUsers() {
+  const users = await userCollection.find().toArray();
+
+  return users;
+}
