@@ -17,6 +17,10 @@ export async function createUserHandler(
 
     const user = await createUser(input);
 
+    if (!user) {
+      reply.status(400).send({ message: "No user found" });
+    }
+
     reply.status(201).send(user);
   } catch (error: any) {
     if (error instanceof MongoError && error.code === 11000) {

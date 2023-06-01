@@ -19,8 +19,6 @@ export async function createUser(input: CreateUserInput) {
 
   const user = await userCollection.findOne({ _id: res.insertedId });
 
-  if (!user) throw new Error("Could not find user");
-
   return user;
 }
 

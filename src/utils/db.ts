@@ -1,4 +1,4 @@
-import { Rental, User } from "@/types";
+import { Rental, User, Vehicle } from "@/types";
 import * as dotenv from "dotenv";
 dotenv.config();
 import { MongoClient } from "mongodb";
@@ -10,6 +10,9 @@ export const userCollection = db.collection<User>("user", {
   ignoreUndefined: true,
 });
 export const rentalCollection = db.collection<Rental>("rental", {
+  ignoreUndefined: true,
+});
+export const vehicleCollection = db.collection<Vehicle>("vehicle", {
   ignoreUndefined: true,
 });
 

@@ -1,5 +1,6 @@
 import { rentalSchemas } from "@/modules/rental/rental.schema";
 import { userSchemas } from "@/modules/user/user.schema";
+import { vehicleSchemas } from "@/modules/vehicle/vehicle.schema";
 import { Role } from "@/types";
 import { buildDatabase } from "@/utils/db";
 import { routeHandler } from "@/utils/routes";
@@ -41,7 +42,7 @@ export async function buildServer() {
     }
   );
 
-  for (const schema of [...userSchemas, ...rentalSchemas]) {
+  for (const schema of [...userSchemas, ...rentalSchemas, ...vehicleSchemas]) {
     server.addSchema(schema);
   }
 

@@ -54,8 +54,8 @@ export type Vehicle = {
   _id?: ObjectId;
   name: string;
   type: VehicleType;
-  rentals: string[];
-  location: string;
+  rentals: ObjectId[];
+  location: ObjectId;
   status: VehicleStatus;
 };
 
