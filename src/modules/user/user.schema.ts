@@ -19,7 +19,14 @@ const createUserInputSchema = z.object({
       location: z.string().optional(),
     })
     .optional(),
-  comments: z.array(z.string()).optional(),
+  comments: z
+    .array(
+      z.object({
+        author: z.string(),
+        comment: z.string(),
+      })
+    )
+    .optional(),
 });
 
 const updateUserInputSchema = z.object({
@@ -42,16 +49,30 @@ const updateUserInputSchema = z.object({
       location: z.string().optional(),
     })
     .optional(),
-  comments: z.array(z.string()).optional(),
+  comments: z
+    .array(
+      z.object({
+        author: z.string(),
+        comment: z.string(),
+      })
+    )
+    .optional(),
+});
+
+const postCommentInputSchema = z.object({
+  author: z.string(),
+  comment: z.string(),
 });
 
 export type CreateUserInput = z.infer<typeof createUserInputSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserInputSchema>;
+export type PostCommentInput = z.infer<typeof postCommentInputSchema>;
 
 export const { schemas: userSchemas, $ref: userRef } = buildJsonSchemas(
   {
     createUserInputSchema,
     updateUserInputSchema,
+    postCommentInputSchema,
   },
   {
     $id: "UserSchema",

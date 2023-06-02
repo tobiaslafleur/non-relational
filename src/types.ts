@@ -15,7 +15,10 @@ export type User = {
     position?: string;
     location?: ObjectId;
   };
-  comments?: string[];
+  comments?: {
+    author: ObjectId;
+    comment: string;
+  }[];
 };
 
 export type Rental = {
@@ -57,12 +60,6 @@ export type Vehicle = {
   rentals: ObjectId[];
   location: ObjectId;
   status: VehicleStatus;
-};
-
-export type Comments = {
-  _id?: ObjectId;
-  user: string;
-  comments: string[];
 };
 
 export type Role = "CUSTOMER" | "EMPLOYEE" | "MANAGER";

@@ -1,8 +1,13 @@
-import { CreateUserInput, UpdateUserInput } from "@/modules/user/user.schema";
+import {
+  CreateUserInput,
+  PostCommentInput,
+  UpdateUserInput,
+} from "@/modules/user/user.schema";
 import {
   createUser,
   getAllUsers,
   updateUserById,
+  postCommentById,
 } from "@/modules/user/user.service";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { MongoError } from "mongodb";
@@ -46,12 +51,10 @@ export async function updateUserByIdHandler(
   request: FastifyRequest<{ Body: UpdateUserInput; Params: { id: string } }>,
   reply: FastifyReply
 ) {
-  const input = request.body;
-
   try {
-    const user = await updateUserById(input, request.params.id);
+    const input = request.body;
 
-    if (!user) return reply.status(400).send({ message: "No user found" });
+    const user = await updateUserById(input, request.params.id);
 
     reply.status(200).send(user);
   } catch (error: any) {
@@ -59,6 +62,21 @@ export async function updateUserByIdHandler(
       reply.status(400).send({ message: "Not a valid ObjectId" });
     }
 
+    reply.status(500).send({ message: "Internal server error" });
+  }
+}
+
+export async function postCommentHandler(
+  request: FastifyRequest<{ Body: PostCommentInput; Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  try {
+    const input = request.body;
+
+    const user = await postCommentById(input, request.params.id);
+
+    reply.status(200).send(user);
+  } catch (error: any) {
     reply.status(500).send({ message: "Internal server error" });
   }
 }

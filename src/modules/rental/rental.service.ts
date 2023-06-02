@@ -1,4 +1,4 @@
-import { vehicleCollection } from "./../../utils/db";
+import { vehicleCollection } from "@/utils/db";
 import { ObjectId } from "mongodb";
 import { CreateRentalInput } from "@/modules/rental/rental.schema";
 import { mongoClient, rentalCollection, userCollection } from "@/utils/db";

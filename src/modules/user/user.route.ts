@@ -3,6 +3,7 @@ import {
   createUserHandler,
   getAllUsersHandler,
   updateUserByIdHandler,
+  postCommentHandler,
 } from "@/modules/user/user.controller";
 import { userRef } from "@/modules/user/user.schema";
 
@@ -29,5 +30,16 @@ export async function userHandler(server: FastifyInstance) {
       preHandler: [server.requireManager],
     },
     updateUserByIdHandler
+  );
+
+  server.post(
+    "/:id/comment",
+    {
+      schema: {
+        body: userRef("postCommentInputSchema"),
+      },
+      preHandler: [server.requireManager],
+    },
+    postCommentHandler
   );
 }
