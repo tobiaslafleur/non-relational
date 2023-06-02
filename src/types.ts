@@ -9,7 +9,7 @@ export type User = {
     enrolled: boolean;
     points: number;
   };
-  rentals: ObjectId[];
+  rentals?: ObjectId[];
   role: Role;
   employeeInformation?: {
     position?: string;

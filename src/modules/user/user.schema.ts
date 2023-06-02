@@ -9,7 +9,7 @@ const createUserInputSchema = z.object({
     enrolled: z.boolean(),
     points: z.number().default(0),
   }),
-  rentals: z.array(z.string()).default([]),
+  rentals: z.array(z.string()).optional(),
   role: z
     .union([z.literal("CUSTOMER"), z.literal("EMPLOYEE"), z.literal("MANAGER")])
     .default("CUSTOMER"),

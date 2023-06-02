@@ -9,7 +9,7 @@ import { ObjectId } from "mongodb";
 export async function createUser(input: CreateUserInput) {
   const { rentals, employeeInformation, comments, ...rest } = input;
 
-  const rentalsAsObjectId = rentals.map(function (rental) {
+  const rentalsAsObjectId = rentals?.map(function (rental) {
     return new ObjectId(rental);
   });
 
@@ -49,6 +49,12 @@ export async function getAllUsers() {
   const users = await userCollection.find().toArray();
 
   return users;
+}
+
+export async function getUserById(id: string) {
+  const user = await userCollection.findOne({ _id: new ObjectId(id) });
+
+  return user;
 }
 
 export async function updateUserById(input: UpdateUserInput, id: string) {

@@ -4,6 +4,7 @@ import {
   getAllUsersHandler,
   updateUserByIdHandler,
   postCommentHandler,
+  getUserByIdHandler,
 } from "@/modules/user/user.controller";
 import { userRef } from "@/modules/user/user.schema";
 
@@ -20,6 +21,14 @@ export async function userHandler(server: FastifyInstance) {
   );
 
   server.get("/", { preHandler: [server.requireManager] }, getAllUsersHandler);
+
+  server.get(
+    "/:id",
+    {
+      preHandler: [server.requireManager],
+    },
+    getUserByIdHandler
+  );
 
   server.put(
     "/:id",

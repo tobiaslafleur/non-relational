@@ -8,6 +8,7 @@ import {
   getAllUsers,
   updateUserById,
   postCommentById,
+  getUserById,
 } from "@/modules/user/user.service";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { MongoError } from "mongodb";
@@ -40,6 +41,19 @@ export async function getAllUsersHandler(
 ) {
   try {
     const users = await getAllUsers();
+
+    reply.status(200).send(users);
+  } catch (error: any) {
+    reply.status(500).send({ message: "Internal server error" });
+  }
+}
+
+export async function getUserByIdHandler(
+  request: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  try {
+    const users = await getUserById(request.params.id);
 
     reply.status(200).send(users);
   } catch (error: any) {
