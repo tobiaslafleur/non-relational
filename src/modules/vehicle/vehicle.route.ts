@@ -1,4 +1,7 @@
-import { createVehicleHandler } from "@/modules/vehicle/vehice.controller";
+import {
+  createVehicleHandler,
+  getAllVehiclesHandler,
+} from "@/modules/vehicle/vehice.controller";
 import { vehicleRef } from "@/modules/vehicle/vehicle.schema";
 import { FastifyInstance } from "fastify";
 
@@ -13,4 +16,6 @@ export async function vehicleHandler(server: FastifyInstance) {
     },
     createVehicleHandler
   );
+
+  server.get("/", {}, getAllVehiclesHandler);
 }

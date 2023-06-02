@@ -19,3 +19,9 @@ export async function createVehicle(input: CreateVehicleInput) {
 
   return vehicle;
 }
+
+export async function getAllVechiles() {
+  const vechiles = await vehicleCollection.find().toArray();
+
+  return vechiles;
+}

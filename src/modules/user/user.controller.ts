@@ -21,8 +21,6 @@ export async function createUserHandler(
   try {
     const input = request.body;
 
-    console.log(input);
-
     const user = await createUser(input);
 
     reply.status(201).send(user);
