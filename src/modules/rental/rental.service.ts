@@ -1,3 +1,4 @@
+import { vehicleCollection } from "./../../utils/db";
 import { ObjectId } from "mongodb";
 import { CreateRentalInput } from "@/modules/rental/rental.schema";
 import { mongoClient, rentalCollection, userCollection } from "@/utils/db";
@@ -16,14 +17,14 @@ export async function createRental(input: CreateRentalInput) {
     const { insertedId } = await rentalCollection.insertOne(
       {
         user: new ObjectId(user),
-        vehicle: vehicle as any,
+        vehicle: new ObjectId(vehicle),
         date: {
           pickup: new Date(date.pickup),
           dropoff: new Date(date.dropoff),
         },
         location: {
-          pickup: location.pickup as any,
-          dropoff: location.dropoff as any,
+          pickup: new ObjectId(location.pickup),
+          dropoff: new ObjectId(location.dropoff),
         },
         ...rest,
       },
@@ -40,9 +41,20 @@ export async function createRental(input: CreateRentalInput) {
       }
     );
 
-    await session.commitTransaction();
+    await vehicleCollection.findOneAndUpdate(
+      { _id: new ObjectId(input.vehicle) },
+      { $push: { rentals: insertedId } },
+      {
+        session,
+      }
+    );
 
-    const rental = await rentalCollection.findOne({ _id: insertedId });
+    const rental = await rentalCollection.findOne(
+      { _id: insertedId },
+      { session }
+    );
+
+    await session.commitTransaction();
 
     return rental;
   } catch (error: any) {

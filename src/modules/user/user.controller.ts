@@ -15,17 +15,16 @@ export async function createUserHandler(
   try {
     const input = request.body;
 
-    const user = await createUser(input);
+    console.log(input);
 
-    if (!user) {
-      reply.status(400).send({ message: "No user found" });
-    }
+    const user = await createUser(input);
 
     reply.status(201).send(user);
   } catch (error: any) {
     if (error instanceof MongoError && error.code === 11000) {
       reply.status(400).send({ message: "Email already in use" });
     }
+    console.log(error);
     reply.status(500).send({ message: "Internal server error" });
   }
 }

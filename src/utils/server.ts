@@ -1,3 +1,4 @@
+import { locationSchemas } from "@/modules/location/location.schema";
 import { rentalSchemas } from "@/modules/rental/rental.schema";
 import { userSchemas } from "@/modules/user/user.schema";
 import { vehicleSchemas } from "@/modules/vehicle/vehicle.schema";
@@ -42,7 +43,12 @@ export async function buildServer() {
     }
   );
 
-  for (const schema of [...userSchemas, ...rentalSchemas, ...vehicleSchemas]) {
+  for (const schema of [
+    ...userSchemas,
+    ...rentalSchemas,
+    ...vehicleSchemas,
+    ...locationSchemas,
+  ]) {
     server.addSchema(schema);
   }
 

@@ -10,7 +10,7 @@ export async function createVehicle(input: CreateVehicleInput) {
   });
 
   const { insertedId } = await vehicleCollection.insertOne({
-    location: location as any,
+    location: new ObjectId(location),
     rentals: rentalsAsObjectId,
     ...rest,
   });

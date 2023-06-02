@@ -9,11 +9,22 @@ export async function createUser(input: CreateUserInput) {
     return new ObjectId(rental);
   });
 
+  const employeeInfo = {
+    employeeInformation: employeeInformation
+      ? {
+          location: employeeInformation?.location
+            ? new ObjectId(employeeInformation?.location)
+            : undefined,
+          position: employeeInformation?.position
+            ? employeeInformation?.position
+            : undefined,
+        }
+      : undefined,
+  };
+
   const res = await userCollection.insertOne({
     rentals: rentalsAsObjectId,
-    employeeInformation: {
-      location: new ObjectId(employeeInformation?.location),
-    },
+    ...employeeInfo,
     ...rest,
   });
 

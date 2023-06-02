@@ -11,10 +11,6 @@ export async function createVehicleHandler(
 
     const vehicle = await createVehicle(input);
 
-    if (!vehicle) {
-      return;
-    }
-
     reply.status(201).send(vehicle);
   } catch (error: any) {
     reply.status(500).send({ message: "Internal server error" });

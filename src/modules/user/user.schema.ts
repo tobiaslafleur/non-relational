@@ -15,8 +15,8 @@ const createUserInputSchema = z.object({
     .default("CUSTOMER"),
   employeeInformation: z
     .object({
-      position: z.string(),
-      location: z.string(),
+      position: z.string().optional(),
+      location: z.string().optional(),
     })
     .optional(),
   comments: z.array(z.string()).optional(),
