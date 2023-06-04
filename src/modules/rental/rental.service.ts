@@ -2,6 +2,7 @@ import { vehicleCollection } from "@/utils/db";
 import { ObjectId } from "mongodb";
 import { CreateRentalInput } from "@/modules/rental/rental.schema";
 import { mongoClient, rentalCollection, userCollection } from "@/utils/db";
+import { getLocationById } from "@/modules/location/location.service";
 
 export async function createRental(input: CreateRentalInput) {
   const session = mongoClient.startSession();
@@ -14,17 +15,53 @@ export async function createRental(input: CreateRentalInput) {
   try {
     const { user, vehicle, date, location, ...rest } = input;
 
-    const { insertedId } = await rentalCollection.insertOne(
+    let _id = new ObjectId();
+
+    const userObj = await userCollection.findOneAndUpdate(
+      { _id: new ObjectId(input.user) },
+      { $push: { rentals: _id } },
       {
-        user: new ObjectId(user),
-        vehicle: new ObjectId(vehicle),
+        projection: {
+          _id: 1,
+          email: 1,
+          firstname: 1,
+          lastname: 1,
+        },
+        session,
+        returnDocument: "after",
+      }
+    );
+
+    const vehicleObj = await vehicleCollection.findOneAndUpdate(
+      { _id: new ObjectId(input.vehicle) },
+      { $push: { rentals: _id } },
+      {
+        projection: {
+          rentals: 0,
+          location: 0,
+          status: 0,
+        },
+        session,
+        returnDocument: "after",
+      }
+    );
+
+    if (!userObj.value || !vehicleObj.value) {
+      throw new Error("User or vehicle not found");
+    }
+
+    await rentalCollection.insertOne(
+      {
+        _id,
+        user: userObj.value,
+        vehicle: vehicleObj.value,
         date: {
           pickup: new Date(date.pickup),
           dropoff: new Date(date.dropoff),
         },
         location: {
-          pickup: new ObjectId(location.pickup),
-          dropoff: new ObjectId(location.dropoff),
+          pickup: await getLocationById(location.pickup),
+          dropoff: await getLocationById(location.dropoff),
         },
         ...rest,
       },
@@ -33,26 +70,7 @@ export async function createRental(input: CreateRentalInput) {
       }
     );
 
-    await userCollection.findOneAndUpdate(
-      { _id: new ObjectId(input.user) },
-      { $push: { rentals: insertedId } },
-      {
-        session,
-      }
-    );
-
-    await vehicleCollection.findOneAndUpdate(
-      { _id: new ObjectId(input.vehicle) },
-      { $push: { rentals: insertedId } },
-      {
-        session,
-      }
-    );
-
-    const rental = await rentalCollection.findOne(
-      { _id: insertedId },
-      { session }
-    );
+    const rental = await rentalCollection.findOne({ _id }, { session });
 
     await session.commitTransaction();
 

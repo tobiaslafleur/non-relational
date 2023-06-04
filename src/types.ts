@@ -23,8 +23,8 @@ export type User = {
 
 export type Rental = {
   _id?: ObjectId;
-  user: ObjectId;
-  vehicle: ObjectId;
+  user: User;
+  vehicle: Vehicle;
   condition?: {
     before: string;
     after: string;
@@ -39,8 +39,8 @@ export type Rental = {
     pointsGenerated: number;
   };
   location: {
-    pickup: ObjectId;
-    dropoff: ObjectId;
+    pickup: Location;
+    dropoff: Location;
   };
   date: {
     pickup: Date;

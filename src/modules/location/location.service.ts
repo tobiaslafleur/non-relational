@@ -1,10 +1,23 @@
-import { locationCollection } from "@/utils/db";
+import { FindOptions, ObjectId } from "mongodb";
+import { locationCollection, updateOne } from "@/utils/db";
 import { CreateLocationInput } from "@/modules/location/location.schema";
 
 export async function createLocation(input: CreateLocationInput) {
-  const { insertedId } = await locationCollection.insertOne(input);
+  await locationCollection.insertOne(input);
+}
 
-  const location = await locationCollection.findOne({ _id: insertedId });
+export async function getLocationById(
+  id: string,
+  options?: FindOptions<Location>
+) {
+  const location = await locationCollection.findOne(
+    { _id: new ObjectId(id) },
+    options
+  );
+
+  if (!location) {
+    throw new Error("No location found");
+  }
 
   return location;
 }

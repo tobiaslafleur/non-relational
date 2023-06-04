@@ -1,7 +1,7 @@
 import { Location, Rental, User, Vehicle } from "@/types";
 import * as dotenv from "dotenv";
 dotenv.config();
-import { MongoClient } from "mongodb";
+import { Collection, Filter, MongoClient } from "mongodb";
 
 export const mongoClient = new MongoClient(process.env.MONGO_URI as string);
 export const db = mongoClient.db("car-rental");
@@ -34,4 +34,27 @@ export async function buildDatabase() {
 
 async function createIndexes() {
   await userCollection.createIndex({ email: 1 }, { unique: true });
+}
+
+export async function updateOne<T>(
+  collection: Collection<T>,
+  input: T,
+  filter: Filter<T> = {}
+) {
+  const data = await collection.findOneAndUpdate(
+    filter,
+    { $set: input },
+    {
+      upsert: true,
+      returnDocument: "after",
+    }
+  );
+
+  console.log(data);
+
+  return data.value;
+}
+
+async function findOne<T>(collection: Collection<T>, filter: Filter<T>) {
+  return await collection.find(filter).toArray();
 }

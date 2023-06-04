@@ -18,7 +18,6 @@ export async function createRentalHandler(
       reply.status(400).send({ message: "Not a valid ObjectId" });
     }
 
-    console.log(error);
     reply.status(500).send({ message: "Internal server error" });
   }
 }

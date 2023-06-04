@@ -16,8 +16,8 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "bson": "^5.3.0",
     "tsx": "^3.12.7",
-    "typescript": "^5.0.4",
-    "bson": "^5.3.0"
+    "typescript": "^5.0.4"
   }
 }

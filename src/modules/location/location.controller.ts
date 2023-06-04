@@ -9,10 +9,11 @@ export async function createLocationHandler(
   try {
     const input = request.body;
 
-    const location = await createLocation(input);
+    await createLocation(input);
 
-    reply.status(201).send(location);
+    reply.status(201).send(input);
   } catch (error) {
+    console.log(error);
     reply.status(500).send({ message: "Internal server error" });
   }
 }
