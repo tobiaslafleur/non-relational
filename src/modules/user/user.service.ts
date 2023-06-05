@@ -1,48 +1,11 @@
-import {
-  CreateUserInput,
-  PostCommentInput,
-  UpdateUserInput,
-} from "@/modules/user/user.schema";
+import { PostCommentInput, UpdateUserInput } from "@/modules/user/user.schema";
+import { User } from "@/types";
 import { userCollection } from "@/utils/db";
+import { FindOptions } from "mongodb";
 import { ObjectId } from "mongodb";
 
-export async function createUser(input: CreateUserInput) {
-  const { rentals, employeeInformation, comments, ...rest } = input;
-
-  const rentalsAsObjectId = rentals?.map(function (rental) {
-    return new ObjectId(rental);
-  });
-
-  const employeeInfo = {
-    employeeInformation: employeeInformation
-      ? {
-          location: employeeInformation?.location
-            ? new ObjectId(employeeInformation?.location)
-            : undefined,
-          position: employeeInformation?.position
-            ? employeeInformation?.position
-            : undefined,
-        }
-      : undefined,
-  };
-
-  const commentsAsObjectId = comments?.map(function (comment) {
-    return {
-      author: new ObjectId(comment.author),
-      comment: comment.comment,
-    };
-  });
-
-  const res = await userCollection.insertOne({
-    rentals: rentalsAsObjectId,
-    ...employeeInfo,
-    ...commentsAsObjectId,
-    ...rest,
-  });
-
-  const user = await userCollection.findOne({ _id: res.insertedId });
-
-  return user;
+export async function createUser(input: User) {
+  await userCollection.insertOne(input);
 }
 
 export async function getAllUsers() {
@@ -51,8 +14,8 @@ export async function getAllUsers() {
   return users;
 }
 
-export async function getUserById(id: string) {
-  const user = await userCollection.findOne({ _id: new ObjectId(id) });
+export async function getUserById(id: string, options?: FindOptions) {
+  const user = await userCollection.findOne({ _id: new ObjectId(id) }, options);
 
   return user;
 }
@@ -62,7 +25,7 @@ export async function updateUserById(input: UpdateUserInput, id: string) {
     { _id: new ObjectId(id) },
     {
       $set: {
-        ...(input as any),
+        ...(input as User),
       },
     },
     { upsert: false, returnDocument: "after" }

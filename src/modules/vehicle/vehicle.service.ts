@@ -4,21 +4,9 @@ import { CreateVehicleInput } from "@/modules/vehicle/vehicle.schema";
 import { Vehicle } from "@/types";
 
 export async function createVehicle(input: CreateVehicleInput) {
-  const { location, rentals, ...rest } = input;
+  input.location = new ObjectId(input.location);
 
-  const rentalsAsObjectId = rentals.map(function (rental) {
-    return new ObjectId(rental);
-  });
-
-  const { insertedId } = await vehicleCollection.insertOne({
-    location: new ObjectId(location),
-    rentals: rentalsAsObjectId,
-    ...rest,
-  });
-
-  const vehicle = await vehicleCollection.findOne({ _id: insertedId });
-
-  return vehicle;
+  await vehicleCollection.insertOne(input);
 }
 
 export async function getAllVechiles() {

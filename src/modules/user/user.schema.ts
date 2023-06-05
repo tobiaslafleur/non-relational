@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { buildJsonSchemas } from "fastify-zod";
+import { ObjectId } from "bson";
 
 const createUserInputSchema = z.object({
   email: z.string(),
@@ -9,20 +10,22 @@ const createUserInputSchema = z.object({
     enrolled: z.boolean(),
     points: z.number().default(0),
   }),
-  rentals: z.array(z.string()).optional(),
   role: z
     .union([z.literal("CUSTOMER"), z.literal("EMPLOYEE"), z.literal("MANAGER")])
     .default("CUSTOMER"),
   employeeInformation: z
     .object({
       position: z.string().optional(),
-      location: z.string().optional(),
+      location: z
+        .string()
+        .transform((id) => new ObjectId(id))
+        .optional(),
     })
     .optional(),
   comments: z
     .array(
       z.object({
-        author: z.string(),
+        author: z.string().transform((id) => new ObjectId(id)),
         comment: z.string(),
       })
     )

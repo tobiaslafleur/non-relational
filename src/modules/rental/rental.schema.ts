@@ -1,9 +1,10 @@
+import { ObjectId } from "mongodb";
 import { buildJsonSchemas } from "fastify-zod";
 import { z } from "zod";
 
 const createRentalInputSchema = z.object({
-  user: z.string(),
-  vehicle: z.string(),
+  user: z.string().transform((id) => new ObjectId(id)),
+  vehicle: z.string().transform((id) => new ObjectId(id)),
   condition: z
     .object({
       before: z.string(),
@@ -22,12 +23,12 @@ const createRentalInputSchema = z.object({
     pointsGenerated: z.number(),
   }),
   location: z.object({
-    pickup: z.string(),
-    dropoff: z.string(),
+    pickup: z.string().transform((id) => new ObjectId(id)),
+    dropoff: z.string().transform((id) => new ObjectId(id)),
   }),
   date: z.object({
-    pickup: z.date(),
-    dropoff: z.date(),
+    pickup: z.date().transform((date) => new Date(date)),
+    dropoff: z.date().transform((date) => new Date(date)),
   }),
 });
 

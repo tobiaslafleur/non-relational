@@ -1,23 +1,29 @@
 import { FindOptions, ObjectId } from "mongodb";
-import { locationCollection, updateOne } from "@/utils/db";
+import { locationCollection } from "@/utils/db";
 import { CreateLocationInput } from "@/modules/location/location.schema";
+import { Location } from "@/types";
 
 export async function createLocation(input: CreateLocationInput) {
   await locationCollection.insertOne(input);
 }
 
 export async function getLocationById(
-  id: string,
+  id: string | ObjectId | Location,
   options?: FindOptions<Location>
 ) {
-  const location = await locationCollection.findOne(
-    { _id: new ObjectId(id) },
-    options
-  );
-
-  if (!location) {
-    throw new Error("No location found");
+  if (typeof id === "string") {
+    id = new ObjectId(id);
   }
 
-  return location;
+  if (id instanceof ObjectId) {
+    const location = await locationCollection.findOne({ _id: id }, options);
+
+    if (!location) {
+      throw new Error("No location found");
+    }
+
+    return location;
+  }
+
+  return id;
 }

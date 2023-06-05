@@ -10,13 +10,15 @@ export async function createRentalHandler(
   try {
     const input = request.body;
 
-    const rental = await createRental(input);
+    await createRental(input);
 
-    reply.status(201).send(rental);
+    reply.status(201).send(input);
   } catch (error: any) {
     if (error instanceof BSONError) {
       reply.status(400).send({ message: "Not a valid ObjectId" });
     }
+
+    console.log(error);
 
     reply.status(500).send({ message: "Internal server error" });
   }

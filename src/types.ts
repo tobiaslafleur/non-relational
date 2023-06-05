@@ -9,7 +9,6 @@ export type User = {
     enrolled: boolean;
     points: number;
   };
-  rentals?: ObjectId[];
   role: Role;
   employeeInformation?: {
     position?: string;
@@ -23,8 +22,8 @@ export type User = {
 
 export type Rental = {
   _id?: ObjectId;
-  user: User;
-  vehicle: Vehicle;
+  user: User | ObjectId;
+  vehicle: Vehicle | ObjectId;
   condition?: {
     before: string;
     after: string;
@@ -39,8 +38,8 @@ export type Rental = {
     pointsGenerated: number;
   };
   location: {
-    pickup: Location;
-    dropoff: Location;
+    pickup: Location | ObjectId;
+    dropoff: Location | ObjectId;
   };
   date: {
     pickup: Date;
@@ -57,8 +56,7 @@ export type Vehicle = {
   _id?: ObjectId;
   name: string;
   type: VehicleType;
-  rentals: ObjectId[];
-  location: ObjectId;
+  location: ObjectId | Location;
   status: VehicleStatus;
 };
 

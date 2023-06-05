@@ -1,10 +1,12 @@
 import { vehicleCollection } from "@/utils/db";
 import { ObjectId } from "mongodb";
-import { CreateRentalInput } from "@/modules/rental/rental.schema";
 import { mongoClient, rentalCollection, userCollection } from "@/utils/db";
 import { getLocationById } from "@/modules/location/location.service";
+import { Rental } from "@/types";
+import { getUserById } from "@/modules/user/user.service";
+import { getVehicleById } from "@/modules/vehicle/vehicle.service";
 
-export async function createRental(input: CreateRentalInput) {
+export async function createRental(input: Rental) {
   const session = mongoClient.startSession();
   session.startTransaction({
     readPreference: "primary",
@@ -13,68 +15,48 @@ export async function createRental(input: CreateRentalInput) {
   });
 
   try {
-    const { user, vehicle, date, location, ...rest } = input;
+    const _id = new ObjectId();
 
-    let _id = new ObjectId();
+    const userObj = await getUserById(input.user as any, {
+      projection: {
+        _id: 1,
+        email: 1,
+        firstname: 1,
+        lastname: 1,
+      },
+      session,
+    });
 
-    const userObj = await userCollection.findOneAndUpdate(
-      { _id: new ObjectId(input.user) },
-      { $push: { rentals: _id } },
-      {
-        projection: {
-          _id: 1,
-          email: 1,
-          firstname: 1,
-          lastname: 1,
-        },
-        session,
-        returnDocument: "after",
-      }
-    );
+    const vehicleObj = await getVehicleById(input.vehicle as any, {
+      projection: {
+        rentals: 0,
+        location: 0,
+        status: 0,
+      },
+      session,
+    });
 
-    const vehicleObj = await vehicleCollection.findOneAndUpdate(
-      { _id: new ObjectId(input.vehicle) },
-      { $push: { rentals: _id } },
-      {
-        projection: {
-          rentals: 0,
-          location: 0,
-          status: 0,
-        },
-        session,
-        returnDocument: "after",
-      }
-    );
+    const pickupObj = await getLocationById(input.location.pickup);
 
-    if (!userObj.value || !vehicleObj.value) {
+    const dropoffObj = await getLocationById(input.location.dropoff);
+
+    if (!userObj || !vehicleObj || !pickupObj || !dropoffObj) {
       throw new Error("User or vehicle not found");
     }
 
-    await rentalCollection.insertOne(
-      {
-        _id,
-        user: userObj.value,
-        vehicle: vehicleObj.value,
-        date: {
-          pickup: new Date(date.pickup),
-          dropoff: new Date(date.dropoff),
-        },
-        location: {
-          pickup: await getLocationById(location.pickup),
-          dropoff: await getLocationById(location.dropoff),
-        },
-        ...rest,
-      },
-      {
-        session,
-      }
-    );
+    input._id = _id;
+    input.user = userObj;
+    input.vehicle = vehicleObj;
+    input.location = {
+      pickup: pickupObj,
+      dropoff: dropoffObj,
+    };
 
-    const rental = await rentalCollection.findOne({ _id }, { session });
+    await rentalCollection.insertOne(input, {
+      session,
+    });
 
     await session.commitTransaction();
-
-    return rental;
   } catch (error: any) {
     await session.abortTransaction();
     throw error;
