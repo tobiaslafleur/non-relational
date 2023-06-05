@@ -1,9 +1,15 @@
 import { ObjectId } from "mongodb";
-import { mongoClient, rentalCollection, userCollection } from "@/utils/db";
+import {
+  mongoClient,
+  rentalCollection,
+  userCollection,
+  vehicleCollection,
+} from "@/utils/db";
 import { getLocationById } from "@/modules/location/location.service";
 import { Rental } from "@/types";
 import { getUserById } from "@/modules/user/user.service";
 import { getVehicleById } from "@/modules/vehicle/vehicle.service";
+import { UpdateRentalInput } from "@/modules/rental/rental.schema";
 
 export async function createRental(input: Rental) {
   const session = mongoClient.startSession();
@@ -23,19 +29,21 @@ export async function createRental(input: Rental) {
     }
 
     if (input.payment.method === "MONEY") {
-      await userCollection.findOneAndUpdate(
-        {
-          _id: new ObjectId(input.user as any),
-        },
-        {
-          $inc: {
-            "loyaltyProgram.points": input.payment.pointsGenerated,
+      if (user.loyaltyProgram.enrolled) {
+        await userCollection.findOneAndUpdate(
+          {
+            _id: new ObjectId(input.user as any),
           },
-        },
-        {
-          session,
-        }
-      );
+          {
+            $inc: {
+              "loyaltyProgram.points": input.payment.pointsGenerated,
+            },
+          },
+          {
+            session,
+          }
+        );
+      }
     } else {
       if (input.payment.amount > user.loyaltyProgram.points) {
         throw new Error("Insufficent funds");
@@ -98,4 +106,29 @@ export async function getAllRentals() {
   const vehicles = await rentalCollection.find().toArray();
 
   return vehicles;
+}
+
+export async function updateRentalById(input: UpdateRentalInput, id: string) {
+  const { location, ...rest } = input;
+
+  const { value: rental } = await rentalCollection.findOneAndUpdate(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        ...(rest as Rental),
+      },
+    },
+    { upsert: false, returnDocument: "after" }
+  );
+
+  if (!location) {
+    return rental;
+  }
+
+  await vehicleCollection.updateOne(
+    { _id: new ObjectId(location.vehicle) },
+    { $set: { location: new ObjectId(location.id) } }
+  );
+
+  return rental;
 }

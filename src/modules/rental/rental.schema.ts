@@ -32,10 +32,32 @@ const createRentalInputSchema = z.object({
   }),
 });
 
+const updateRentalInputSchema = z.object({
+  condition: z
+    .object({
+      before: z.string().optional(),
+      after: z.string().optional(),
+    })
+    .optional(),
+  miles: z
+    .object({
+      before: z.number().optional(),
+      after: z.number().optional(),
+    })
+    .optional(),
+  location: z
+    .object({
+      id: z.string(),
+      vehicle: z.string(),
+    })
+    .optional(),
+});
+
 export type CreateRentalInput = z.infer<typeof createRentalInputSchema>;
+export type UpdateRentalInput = z.infer<typeof updateRentalInputSchema>;
 
 export const { schemas: rentalSchemas, $ref: rentalRef } = buildJsonSchemas(
-  { createRentalInputSchema },
+  { createRentalInputSchema, updateRentalInputSchema },
   {
     $id: "RentalSchema",
   }

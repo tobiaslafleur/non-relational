@@ -1,6 +1,13 @@
 import { BSONError } from "bson";
-import { CreateRentalInput } from "@/modules/rental/rental.schema";
-import { createRental, getAllRentals } from "@/modules/rental/rental.service";
+import {
+  CreateRentalInput,
+  UpdateRentalInput,
+} from "@/modules/rental/rental.schema";
+import {
+  createRental,
+  getAllRentals,
+  updateRentalById,
+} from "@/modules/rental/rental.service";
 import { FastifyRequest, FastifyReply } from "fastify";
 
 export async function createRentalHandler(
@@ -29,6 +36,22 @@ export async function getAllRentalsHandler(
     const vehicles = await getAllRentals();
 
     reply.status(201).send(vehicles);
+  } catch (error: any) {
+    reply.status(500).send({ message: "Internal server error" });
+  }
+}
+
+export async function updateRentalByIdHandler(
+  request: FastifyRequest<{ Params: { id: string }; Body: UpdateRentalInput }>,
+  reply: FastifyReply
+) {
+  try {
+    const id = request.params.id;
+    const input = request.body;
+
+    const rental = await updateRentalById(input, id);
+
+    reply.status(200).send(rental);
   } catch (error: any) {
     reply.status(500).send({ message: "Internal server error" });
   }
