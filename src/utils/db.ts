@@ -36,4 +36,5 @@ async function createIndexes() {
   await userCollection.createIndex({ email: 1 }, { unique: true });
   await rentalCollection.createIndex({ "date.pickup": 1 });
   await rentalCollection.createIndex({ "date.dropoff": 1 });
+  await rentalCollection.createIndex({ user: 1 });
 }

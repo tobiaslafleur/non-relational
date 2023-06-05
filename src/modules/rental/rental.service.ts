@@ -132,3 +132,17 @@ export async function updateRentalById(input: UpdateRentalInput, id: string) {
 
   return rental;
 }
+
+export async function getCurrentRentals() {
+  const rentals = await rentalCollection
+    .find({
+      $or: [
+        { "date.pickup": { $gte: new Date().toISOString() } },
+        { "date.dropoff": { $gte: new Date().toISOString() } },
+      ],
+    })
+    .sort({ "date.pickup": 1 })
+    .toArray();
+
+  return rentals;
+}

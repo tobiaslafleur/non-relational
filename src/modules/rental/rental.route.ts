@@ -1,6 +1,7 @@
 import {
   createRentalHandler,
   getAllRentalsHandler,
+  getCurrentRentalsHandler,
   updateRentalByIdHandler,
 } from "@/modules/rental/rental.controller";
 import { rentalRef } from "@/modules/rental/rental.schema";
@@ -31,5 +32,11 @@ export async function rentalHandler(server: FastifyInstance) {
       preHandler: [server.requireEmployee],
     },
     updateRentalByIdHandler
+  );
+
+  server.get(
+    "/current",
+    { preHandler: [server.requireEmployee] },
+    getCurrentRentalsHandler
   );
 }

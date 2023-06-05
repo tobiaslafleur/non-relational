@@ -6,6 +6,7 @@ import {
 import {
   createRental,
   getAllRentals,
+  getCurrentRentals,
   updateRentalById,
 } from "@/modules/rental/rental.service";
 import { FastifyRequest, FastifyReply } from "fastify";
@@ -24,6 +25,7 @@ export async function createRentalHandler(
     if (error instanceof BSONError) {
       reply.status(400).send({ message: "Not a valid ObjectId" });
     }
+
     reply.status(500).send({ message: "Internal server error" });
   }
 }
@@ -52,6 +54,19 @@ export async function updateRentalByIdHandler(
     const rental = await updateRentalById(input, id);
 
     reply.status(200).send(rental);
+  } catch (error: any) {
+    reply.status(500).send({ message: "Internal server error" });
+  }
+}
+
+export async function getCurrentRentalsHandler(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  try {
+    const rentals = await getCurrentRentals();
+
+    reply.status(200).send(rentals);
   } catch (error: any) {
     reply.status(500).send({ message: "Internal server error" });
   }
