@@ -1,4 +1,7 @@
-import { createRentalHandler } from "@/modules/rental/rental.controller";
+import {
+  createRentalHandler,
+  getAllRentalsHandler,
+} from "@/modules/rental/rental.controller";
 import { rentalRef } from "@/modules/rental/rental.schema";
 import { FastifyInstance } from "fastify";
 
@@ -12,5 +15,11 @@ export async function rentalHandler(server: FastifyInstance) {
       preHandler: [server.requireEmployee],
     },
     createRentalHandler
+  );
+
+  server.get(
+    "/",
+    { preHandler: [server.requireEmployee] },
+    getAllRentalsHandler
   );
 }

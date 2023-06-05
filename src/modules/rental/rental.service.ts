@@ -1,4 +1,3 @@
-import { vehicleCollection } from "@/utils/db";
 import { ObjectId } from "mongodb";
 import { mongoClient, rentalCollection, userCollection } from "@/utils/db";
 import { getLocationById } from "@/modules/location/location.service";
@@ -17,17 +16,47 @@ export async function createRental(input: Rental) {
   try {
     const _id = new ObjectId();
 
-    const userObj = await getUserById(input.user as any, {
-      projection: {
-        _id: 1,
-        email: 1,
-        firstname: 1,
-        lastname: 1,
-      },
-      session,
-    });
+    const user = await getUserById(input.user as any);
 
-    const vehicleObj = await getVehicleById(input.vehicle as any, {
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (input.payment.method === "MONEY") {
+      await userCollection.findOneAndUpdate(
+        {
+          _id: new ObjectId(input.user as any),
+        },
+        {
+          $inc: {
+            "loyaltyProgram.points": input.payment.pointsGenerated,
+          },
+        },
+        {
+          session,
+        }
+      );
+    } else {
+      if (input.payment.amount > user.loyaltyProgram.points) {
+        throw new Error("Insufficent funds");
+      }
+
+      await userCollection.findOneAndUpdate(
+        {
+          _id: new ObjectId(input.user as any),
+        },
+        {
+          $inc: {
+            "loyaltyProgram.points": -input.payment.pointsGenerated,
+          },
+        },
+        {
+          session,
+        }
+      );
+    }
+
+    const vehicle = await getVehicleById(input.vehicle as any, {
       projection: {
         rentals: 0,
         location: 0,
@@ -36,20 +65,20 @@ export async function createRental(input: Rental) {
       session,
     });
 
-    const pickupObj = await getLocationById(input.location.pickup);
+    const pickup = await getLocationById(input.location.pickup);
 
-    const dropoffObj = await getLocationById(input.location.dropoff);
+    const dropoff = await getLocationById(input.location.dropoff);
 
-    if (!userObj || !vehicleObj || !pickupObj || !dropoffObj) {
-      throw new Error("User or vehicle not found");
+    if (!vehicle || !pickup || !dropoff) {
+      throw new Error("User or location not found");
     }
 
     input._id = _id;
-    input.user = userObj;
-    input.vehicle = vehicleObj;
+    input.user = user;
+    input.vehicle = vehicle;
     input.location = {
-      pickup: pickupObj,
-      dropoff: dropoffObj,
+      pickup: pickup,
+      dropoff: dropoff,
     };
 
     await rentalCollection.insertOne(input, {
@@ -63,4 +92,10 @@ export async function createRental(input: Rental) {
   } finally {
     session.endSession();
   }
+}
+
+export async function getAllRentals() {
+  const vehicles = await rentalCollection.find().toArray();
+
+  return vehicles;
 }
