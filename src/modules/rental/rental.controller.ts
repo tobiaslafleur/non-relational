@@ -1,4 +1,4 @@
-import { BSONError } from "bson";
+import { BSONError, ObjectId } from "bson";
 import {
   CreateRentalInput,
   UpdateRentalInput,
@@ -10,6 +10,8 @@ import {
   updateRentalById,
 } from "@/modules/rental/rental.service";
 import { FastifyRequest, FastifyReply } from "fastify";
+import { Filter, FindOptions } from "mongodb";
+import { Rental } from "@/types";
 
 export async function createRentalHandler(
   request: FastifyRequest<{ Body: CreateRentalInput }>,
@@ -31,11 +33,57 @@ export async function createRentalHandler(
 }
 
 export async function getAllRentalsHandler(
-  request: FastifyRequest<{ Body: CreateRentalInput }>,
+  request: FastifyRequest<{
+    Body: CreateRentalInput;
+    Querystring: {
+      type: "date" | "location" | "user";
+      start?: string;
+      end?: string;
+      id?: string;
+    };
+  }>,
   reply: FastifyReply
 ) {
   try {
-    const vehicles = await getAllRentals();
+    const { type, start, end, id } = request.query;
+
+    let options: Filter<Rental> = {};
+
+    switch (type) {
+      case "user":
+        if (!id) {
+          throw new Error("Invalid querystring");
+        }
+
+        options = { "user._id": new ObjectId(id) };
+        break;
+      case "location":
+        if (!id) {
+          throw new Error("Invalid querystring");
+        }
+
+        options = {
+          $or: [
+            { "location.pickup._id": new ObjectId(id) },
+            { "location.dropoff._id": new ObjectId(id) },
+          ],
+        };
+        break;
+      case "date":
+        if (!start || !end) {
+          throw new Error("Invalid querystring");
+        }
+
+        options = {
+          $and: [
+            { "date.pickup": { $gte: new Date(start).toISOString() } },
+            { "date.dropoff": { $lte: new Date(end).toISOString() } },
+          ],
+        };
+        break;
+    }
+
+    const vehicles = await getAllRentals(options);
 
     reply.status(201).send(vehicles);
   } catch (error: any) {

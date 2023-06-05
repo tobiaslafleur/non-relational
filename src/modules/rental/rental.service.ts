@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Filter, FindOptions, ObjectId } from "mongodb";
 import {
   mongoClient,
   rentalCollection,
@@ -102,8 +102,8 @@ export async function createRental(input: Rental) {
   }
 }
 
-export async function getAllRentals() {
-  const vehicles = await rentalCollection.find().toArray();
+export async function getAllRentals(options?: Filter<Rental>) {
+  const vehicles = await rentalCollection.find({ ...options }).toArray();
 
   return vehicles;
 }
